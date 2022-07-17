@@ -1,6 +1,13 @@
 use hex_literal::hex;
 use sha2::{digest::generic_array::GenericArray, Digest, Sha256, Sha512};
-use std::{collections::HashMap, fs::File, hash, str::Bytes, path::Path, io::{BufReader, BufRead}};
+use std::{
+    collections::HashMap,
+    fs::File,
+    hash,
+    io::{BufRead, BufReader},
+    path::Path,
+    str::Bytes,
+};
 use typenum::U256;
 
 struct FileDuplicates {
@@ -14,7 +21,6 @@ fn hash_string(line: &String) -> Result<String, Box<dyn std::error::Error>> {
     // read hash digest and consume hasher
     Ok(format!("{:X}", hasher.finalize()))
 }
-
 
 impl FileDuplicates {
     fn new() -> FileDuplicates {
@@ -31,7 +37,7 @@ impl FileDuplicates {
     fn from_file(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let file = File::open(filepath)?;
         let reader = BufReader::new(file);
-    
+
         Ok(for line in reader.lines() {
             self.add(&line?, 12);
         })
@@ -55,7 +61,6 @@ fn main() {
 
     print!("{:?}", t.dupes);
 }
-
 
 #[cfg(test)]
 mod tests {
