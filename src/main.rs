@@ -1,14 +1,10 @@
-use hex_literal::hex;
-use sha2::{digest::generic_array::GenericArray, Digest, Sha256, Sha512};
+use sha2::{Digest, Sha256};
 use std::{
     collections::HashMap,
     fs::File,
-    hash,
     io::{BufRead, BufReader},
     path::Path,
-    str::Bytes,
 };
-use typenum::U256;
 
 struct FileDuplicates {
     dupes: HashMap<String, Vec<u32>>,
