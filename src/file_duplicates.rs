@@ -40,7 +40,7 @@ impl FileDuplicates {
     }
 
     pub(crate) fn prune(&mut self) {
-        self.dupes.retain(|_,v| v.len() > 1)
+        self.dupes.retain(|_, v| v.len() > 1)
     }
 }
 
