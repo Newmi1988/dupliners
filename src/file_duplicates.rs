@@ -9,7 +9,7 @@ use std::{
 use crate::folder_explorer::visit_dirs;
 
 pub(crate) struct FileDuplicates {
-    pub(crate) dupes: HashMap<String, Vec<u32>>,
+    pub(crate) dupes: HashMap<String, HashMap<PathBuf, Vec<u32>>>,
 }
 
 fn hash_string(line: &String) -> Result<String, Box<dyn std::error::Error>> {
@@ -27,21 +27,32 @@ impl FileDuplicates {
         }
     }
 
-    fn add(&mut self, line: &String, number: u32) -> () {
+    fn add(&mut self, line: &String, number: u32, file: &Path) -> () {
         let hash = hash_string(line).expect("Error hashing line");
-        self.dupes.entry(hash).or_insert(Vec::new()).push(number);
+        // BUG: The first element of the vec is always duplicated
+        self.dupes
+            .entry(hash)
+            .or_insert(HashMap::from([(file.to_path_buf(), vec![number])]))
+            .entry(file.to_path_buf())
+            .or_insert(Vec::new())
+            .push(number);
     }
 
     pub(crate) fn from_file(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let file = File::open(filepath)?;
         let reader = BufReader::new(file);
 
-        Ok(for (i,line) in reader.lines().enumerate() {
-            self.add(&line?, i.try_into().unwrap());
+        Ok(for (mut i, line) in reader.lines().enumerate() {
+            let l = line?;
+            i += 1;
+            if l.trim().len() > 1 {
+                self.add(&l, i.try_into().unwrap(), filepath);
+            }
         })
     }
 
     pub(crate) fn prune(&mut self) {
+        // TODO: Fix the logic. Discarde all the items where the summed up length of all entries is < 2
         self.dupes.retain(|_, v| v.len() > 1)
     }
 
