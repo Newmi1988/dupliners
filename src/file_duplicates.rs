@@ -3,8 +3,10 @@ use std::{
     collections::HashMap,
     fs::File,
     io::{BufRead, BufReader},
-    path::Path,
+    path::{Path, PathBuf},
 };
+
+use crate::folder_explorer::visit_dirs;
 
 pub(crate) struct FileDuplicates {
     pub(crate) dupes: HashMap<String, Vec<u32>>,
@@ -41,6 +43,16 @@ impl FileDuplicates {
 
     pub(crate) fn prune(&mut self) {
         self.dupes.retain(|_, v| v.len() > 1)
+    }
+
+    pub(crate) fn recurse_fs(&mut self, filepath : &Path) -> Result<(), Box<dyn std::error::Error>> {
+        let paths = visit_dirs(filepath).expect("IO Error");
+        for path in paths {
+            // let p = path;
+            self.from_file(&path);
+        }
+
+        Ok(())
     }
 }
 
