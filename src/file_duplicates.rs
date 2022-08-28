@@ -45,7 +45,7 @@ impl FileDuplicates {
         self.dupes.retain(|_, v| v.len() > 1)
     }
 
-    pub(crate) fn recurse_fs(&mut self, filepath : &Path) -> Result<(), Box<dyn std::error::Error>> {
+    pub(crate) fn recurse_fs(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let paths = visit_dirs(filepath).expect("IO Error");
         for path in paths {
             // let p = path;

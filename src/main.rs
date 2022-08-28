@@ -14,6 +14,4 @@ fn main() {
     t.recurse_fs(root).expect("IO Error");
     t.prune();
     print!("{:?}", t.dupes);
-
-
 }
