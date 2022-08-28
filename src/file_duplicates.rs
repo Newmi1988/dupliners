@@ -36,8 +36,8 @@ impl FileDuplicates {
         let file = File::open(filepath)?;
         let reader = BufReader::new(file);
 
-        Ok(for line in reader.lines() {
-            self.add(&line?, 12);
+        Ok(for (i,line) in reader.lines().enumerate() {
+            self.add(&line?, i.try_into().unwrap());
         })
     }
 
