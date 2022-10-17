@@ -12,6 +12,6 @@ fn main() {
     let root = Path::new("./src");
 
     t.recurse_fs(root).expect("IO Error");
-    // t.prune();
+    t.prune();
     print!("{:?}", t.dupes);
 }

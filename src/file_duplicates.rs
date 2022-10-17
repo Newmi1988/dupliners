@@ -30,9 +30,11 @@ impl FileDuplicates {
     fn add(&mut self, line: &String, number: u32, file: &Path) -> () {
         let hash = hash_string(line).expect("Error hashing line");
         // BUG: The first element of the vec is always duplicated
+        // UPDATE: Possibly fixed
         self.dupes
             .entry(hash)
-            .or_insert(HashMap::from([(file.to_path_buf(), vec![number])]))
+            // .or_insert(HashMap::from([(file.to_path_buf(), vec![number])]))
+            .or_insert(HashMap::from([(file.to_path_buf(), vec![])]))
             .entry(file.to_path_buf())
             .or_insert(Vec::new())
             .push(number);
