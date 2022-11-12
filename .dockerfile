@@ -1,9 +1,8 @@
-FROM rust:1.40 as builder
-WORKDIR /usr/src/myapp
+FROM rust:1.65 as builder
+WORKDIR /usr/src/dupliners
 COPY . .
 RUN cargo install --path .
 
 FROM debian:buster-slim
-RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /usr/local/cargo/bin/myapp /usr/local/bin/myapp
-CMD ["myapp"]
+COPY --from=builder /usr/local/cargo/bin/dupliners /usr/local/bin/dupliners
+CMD ["dupliners"]
