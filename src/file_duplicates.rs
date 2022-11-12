@@ -7,6 +7,7 @@ use std::{
 };
 
 use crate::folder_explorer::visit_dirs;
+use std::collections::hash_map::Entry;
 
 pub(crate) struct FileDuplicates {
     pub(crate) dupes: HashMap<String, HashMap<PathBuf, Vec<u32>>>,
@@ -18,6 +19,14 @@ fn hash_string(line: &String) -> Result<String, Box<dyn std::error::Error>> {
     hasher.update(line.as_bytes());
     // read hash digest and consume hasher
     Ok(format!("{:X}", hasher.finalize()))
+}
+
+fn remove(hm: &mut HashMap<String, HashMap<PathBuf, Vec<u32>>>, index: String) {
+    if let Entry::Occupied(o) = hm.entry(index) {
+        if o.get().is_empty() {
+            o.remove_entry();
+        }
+    }
 }
 
 impl FileDuplicates {
@@ -55,13 +64,29 @@ impl FileDuplicates {
 
     pub(crate) fn prune(&mut self) {
         // TODO: Fix the logic. Discarde all the items where the summed up length of all entries is < 2
-        self.dupes.retain(|_, v| v.len() > 1)
+        // TODO: go one level deeper, we want du retain the itmes
+        // self.dupes.retain(|_, v| v.len() > 1)
+        // self.dupes.retain(|_, v| v.values().len() > 1);
+        let mut keys_to_delte: Vec<String> = Vec::new();
+        for (k, v) in self.dupes.iter() {
+            let mut sum_item: u32 = 0;
+            for v in v.values() {
+                sum_item += v.len() as u32;
+            }
+            if sum_item == 1 {
+                keys_to_delte.push(k.to_string());
+            }
+        }
+        println!("{:?}", self.dupes.len());
+        for key in keys_to_delte.iter() {
+            self.dupes.remove(key);
+        }
+        println!("{:?}", self.dupes.len());
     }
 
     pub(crate) fn recurse_fs(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let paths = visit_dirs(filepath).expect("IO Error");
         for path in paths {
-            // let p = path;
             self.from_file(&path);
         }
 

@@ -20,6 +20,7 @@ fn main() {
     let root = Path::new(&args.path);
 
     t.recurse_fs(root).expect("IO Error");
+    // print!("{:?}", &t.dupes);
     t.prune();
     print!("{:?}", t.dupes);
 }
