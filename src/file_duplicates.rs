@@ -38,11 +38,8 @@ impl FileDuplicates {
 
     fn add(&mut self, line: &String, number: u32, file: &Path) -> () {
         let hash = hash_string(line).expect("Error hashing line");
-        // BUG: The first element of the vec is always duplicated
-        // UPDATE: Possibly fixed
         self.dupes
             .entry(hash)
-            // .or_insert(HashMap::from([(file.to_path_buf(), vec![number])]))
             .or_insert(HashMap::from([(file.to_path_buf(), vec![])]))
             .entry(file.to_path_buf())
             .or_insert(Vec::new())
@@ -63,10 +60,6 @@ impl FileDuplicates {
     }
 
     pub(crate) fn prune(&mut self) {
-        // TODO: Fix the logic. Discarde all the items where the summed up length of all entries is < 2
-        // TODO: go one level deeper, we want du retain the itmes
-        // self.dupes.retain(|_, v| v.len() > 1)
-        // self.dupes.retain(|_, v| v.values().len() > 1);
         let mut keys_to_delte: Vec<String> = Vec::new();
         for (k, v) in self.dupes.iter() {
             let mut sum_item: u32 = 0;
@@ -77,11 +70,9 @@ impl FileDuplicates {
                 keys_to_delte.push(k.to_string());
             }
         }
-        println!("{:?}", self.dupes.len());
         for key in keys_to_delte.iter() {
             self.dupes.remove(key);
         }
-        println!("{:?}", self.dupes.len());
     }
 
     pub(crate) fn recurse_fs(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {

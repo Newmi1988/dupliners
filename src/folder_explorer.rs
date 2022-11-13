@@ -12,7 +12,6 @@ pub fn visit_dirs(dir: &Path) -> io::Result<Vec<PathBuf>> {
                 visit_dirs(&path)?;
             } else {
                 dirs.push(entry.path());
-                println!("{}", path.display());
             }
         }
     }
