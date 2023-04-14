@@ -18,9 +18,6 @@ pub fn visit_dirs(dir: &Path) -> io::Result<Vec<PathBuf>> {
     Ok(dirs)
 }
 
-use std::fs::File;
-use tempfile::tempdir;
-
 // test
 // test
 // test
@@ -28,6 +25,8 @@ use tempfile::tempdir;
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::fs::File;
+    use tempfile::tempdir;
 
     #[test]
     fn test_visit_dirs() {

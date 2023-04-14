@@ -36,7 +36,7 @@ impl FileDuplicates {
         }
     }
 
-    fn add(&mut self, line: &String, number: u32, file: &Path) -> () {
+    fn add(&mut self, line: &String, number: u32, file: &Path) {
         let hash = hash_string(line).expect("Error hashing line");
         self.dupes
             .entry(hash)
@@ -46,17 +46,18 @@ impl FileDuplicates {
             .push(number);
     }
 
-    pub(crate) fn from_file(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    pub(crate) fn read_file(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let file = File::open(filepath)?;
         let reader = BufReader::new(file);
 
-        Ok(for (mut i, line) in reader.lines().enumerate() {
+        for (mut i, line) in reader.lines().enumerate() {
             let l = line?;
             i += 1;
             if l.trim().len() > 1 {
                 self.add(&l, i.try_into().unwrap(), filepath);
             }
-        })
+        }
+        Ok(())
     }
 
     pub(crate) fn prune(&mut self) {
@@ -78,7 +79,7 @@ impl FileDuplicates {
     pub(crate) fn recurse_fs(&mut self, filepath: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let paths = visit_dirs(filepath).expect("IO Error");
         for path in paths {
-            self.from_file(&path);
+            let _ = self.read_file(&path);
         }
 
         Ok(())

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::{file_duplicates::FileDuplicates, folder_explorer::visit_dirs};
+use crate::file_duplicates::FileDuplicates;
 
 mod file_duplicates;
 mod folder_explorer;
